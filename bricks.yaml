@@ -1,0 +1,23 @@
+apikey: J1okPxXwdFoSvt9Bnz5V
+device_id: python_RaspberryPi_89d270fc-c03b-11ed-92f1-dca632357e6a
+meta:
+  create_autostart: true
+  created: 1678559704766
+  platform: RaspberryPi
+relays:
+- gpio: 201
+  invert: false
+  device: kasa
+  alias: PGPIO_1
+- gpio: 202
+  invert: false
+  device: kasa
+  alias: PGPIO_2
+- gpio: 203
+  invert: false
+  device: kasa
+  alias: PGPIO_3
+start_fullscreen: false
+start_ui: false
+temperature_sensors:
+- 0300a279cd1d

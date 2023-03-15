@@ -5,6 +5,10 @@ import json
 import yaml # reading the config
 import RPi.GPIO as GPIO 
 from w1thermsensor import W1ThermSensor
+
+# import plugins as PGPIO to allow processing plugins
+import plugins as PGPIO
+
 try:
     import httplib  # python < 3.0
 except:
@@ -43,8 +47,12 @@ def initRelays():
         config["relays"][i]["state"] = 0
         gpio_number = config["relays"][i]["gpio"]
         logging.info(f"initializing relay {i+1} (GPIO {gpio_number})...")
-        GPIO.setup(gpio_number, GPIO.OUT)
-        GPIO.output(gpio_number, 0)
+        # Added an IF ELSE to send any relay numbered 200+ to PGPIO not to GPIO.
+        if gpio_number < 200:
+            GPIO.setup(gpio_number, GPIO.OUT)
+            GPIO.output(gpio_number, 0)
+        else:
+            PGPIO.output(gpio_number,0)
         
         
 def setRelay(number=0, state=0):
@@ -64,8 +72,11 @@ def setRelay(number=0, state=0):
         logging.info(f"inverted {state} to {corrected_state}")
     else:
         corrected_state = state
-    
-    GPIO.output(gpio_number, corrected_state)
+     # Added an IF ELSE to send any relay numbered 200+ to PGPIO not to GPIO.
+        if gpio_number < 200:
+             GPIO.output(gpio_number, corrected_state)
+        else:
+             PGPIO.output(gpio_number, corrected_state)    
         
         
 def getRelay(number=0):
