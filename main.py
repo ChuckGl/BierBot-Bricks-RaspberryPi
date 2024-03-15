@@ -7,6 +7,14 @@ import RPi.GPIO as GPIO
 import yaml  # reading the config
 from w1thermsensor import W1ThermSensor
 
+# import plugins from plugins directory
+import os
+import sys
+plugins_dir = os.path.join(os.path.dirname(__file__), "plugins")
+sys.path.append(plugins_dir)
+
+import tplink
+
 try:
     import httplib  # python < 3.0
 except Exception:
@@ -53,8 +61,14 @@ def initRelays() -> None:
         config["relays"][i]["state"] = 0
         gpio_number = config["relays"][i]["gpio"]
         logging.info(f"initializing relay {i+1} (GPIO {gpio_number})...")
-        GPIO.setup(gpio_number, GPIO.OUT)
-        GPIO.output(gpio_number, 0)
+        # Added an IF ELSE to send any relay numbered 200+ to tplink not to GPIO.
+        if gpio_number < 200:
+            GPIO.setup(gpio_number, GPIO.OUT)
+            GPIO.output(gpio_number, 0)
+        else:
+            tplink.output(gpio_number,0)
+    # Added 5 second delay to ensure relays completed initialization and show ready.
+    time.sleep(5)
 
 
 def setRelay(number: int = 0, state: int = 0) -> None:
@@ -75,7 +89,11 @@ def setRelay(number: int = 0, state: int = 0) -> None:
     else:
         corrected_state = state
 
-    GPIO.output(gpio_number, corrected_state)
+    # Added an IF ELSE to send any relay numbered 200+ to tplink not to GPIO.
+    if gpio_number < 200:
+        GPIO.output(gpio_number, corrected_state)
+    else:
+        tplink.output(gpio_number, corrected_state) 
 
 
 def getRelay(number: int = 0) -> int:
@@ -166,7 +184,6 @@ def request() -> None:
 
 def run() -> None:
     initRelays()
-
     logging.info("checking for internet connection...")
     while not haveInternet():
         logging.info("No internet - sleeping for 1s.")

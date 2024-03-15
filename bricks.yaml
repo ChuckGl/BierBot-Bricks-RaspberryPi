@@ -1,0 +1,18 @@
+apikey: J1okPxXwdFoSvt9Bnz5V
+device_id: python_RaspberryPi_578b968c-dd5e-11ee-b75b-dca632357e6b
+meta:
+  create_autostart: true
+  created: 1709910746860
+  platform: RaspberryPi
+relays:
+- gpio: 201
+  invert: false
+  device: kasa
+  alias: CoolSim
+- gpio: 202
+  invert: false
+  device: kasa
+  alias: HeatSim
+start_fullscreen: true
+start_ui: true
+temperature_sensors: []
