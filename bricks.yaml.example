@@ -9,6 +9,14 @@ relays:
   invert: false
 - gpio: 37
   invert: true
+- gpio: 201
+  invert: false
+  device: kasa
+  alias: HS100_Cooling
+- gpio: 202
+  invert: false
+  device: kasa
+  alias: HS110_Heating
 start_fullscreen: true
 temperature_sensors:
 - aaa
