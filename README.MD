@@ -70,7 +70,7 @@ git clone https://github.com/BernhardSchlegel/BierBot-Bricks-RaspberryPi.git
 cd BierBot-Bricks-RaspberryPi
 
 # Setup python virtual environment. Required for Bookworm.  See link for more: https://www.raspberrypi.com/documentation/computers/os.html#python-on-raspberry-pi
-python3 -m venv .env && source .env/bin/activate && pip install -r requirements_bookworm.txt
+python3 -m venv .env && source .env/bin/activate && pip install -r requirements_plugins.txt
 
 # Link virtual environment to system-level lgpio package. The lgpio package in combination with rpi-lgpio replaces RPi.GPIO in bookworm. The lgpio package is managed using apt which is not supported in virtual environments. This gets around that issue for now.
 ln -s /usr/lib/python3/dist-packages/lgpio.py $VIRTUAL_ENV/lib/python3.11/site-packages/lgpio.py
@@ -82,6 +82,12 @@ sudo -E env PATH=$PATH python3 setup.py
 Setup will guide you through the installation. :information_source: Hint: You can accept the proposed default value by hitting <kbd>Return</kbd>.
 
 Tested on Python 3.11
+
+#### Adding Plugins
+To add a new plugin:
+
+1. Place new plugin into the plugins directory
+2. Edit main.py and add the import statement after the line "import tplink"  The import should be the plugin name without .py
 
 #### Rotating the "Official 7" Touch Display with Wayland
 Some cases mount the display upside down.  There were originally issues with rotating the display and touchscreen running Wayland Desktop.  This appears to be fixed. Here are the steps to "flip" the display and touchscreen:
