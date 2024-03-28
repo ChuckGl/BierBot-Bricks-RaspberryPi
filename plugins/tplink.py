@@ -23,14 +23,17 @@ class output():
         self.state = state
 
         for relay in output.config["relays"]:
-            if "device" not in relay or "alias" not in relay or not relay["device"] or not relay["alias"]:
-                logging.error("Alias or Device missing for wifi relay. Please fix and restart.")
-                return
-
             if relay["gpio"] == self.gpio_number:
+                if "device" not in relay or "alias" not in relay or not relay["device"] or not relay["alias"]:
+                    logging.error("Alias or Device missing for wifi relay. Please fix and restart.")
+                    return
+
                 self.device = relay["device"]
                 self.alias = relay["alias"]
                 break
+        else:
+            logging.error(f"No relay found for GPIO Number: {self.gpio_number}")
+            return
 
         if self.device == "kasa" and self.alias:
             for alias, ip in output.device_info.items():
@@ -56,14 +59,12 @@ class output():
     async def turn_off_kasa_device(self):
         await self.control_device.turn_off()
         await self.control_device.update()
-        #self.control_device.state_information()
         if self.control_device.is_off:
             logging.info(f"Turned off {self.alias}")
 
     async def turn_on_kasa_device(self):
         await self.control_device.turn_on()
         await self.control_device.update()
-        #self.control_device.state_information()
         if self.control_device.is_on:
             logging.info(f"Turned on {self.alias}")
 

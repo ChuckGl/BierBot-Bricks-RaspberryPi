@@ -12,8 +12,8 @@ import os
 import sys
 plugins_dir = os.path.join(os.path.dirname(__file__), "plugins")
 sys.path.append(plugins_dir)
-
 import tplink
+from influxdb2 import InfluxDBWriter
 
 try:
     import httplib  # python < 3.0
@@ -67,6 +67,8 @@ def initRelays() -> None:
             GPIO.output(gpio_number, 0)
         else:
             tplink.output(gpio_number,0)
+        influx_writer = InfluxDBWriter()
+        influx_writer.write_data(gpio_number, state=0)
     # Added 5 second delay to ensure relays completed initialization and show ready.
     time.sleep(5)
 
@@ -94,6 +96,8 @@ def setRelay(number: int = 0, state: int = 0) -> None:
         GPIO.output(gpio_number, corrected_state)
     else:
         tplink.output(gpio_number, corrected_state) 
+    influx_writer = InfluxDBWriter()
+    influx_writer.write_data(gpio_number, corrected_state)
 
 
 def getRelay(number: int = 0) -> int:
@@ -129,7 +133,7 @@ def request() -> None:
         key = f"a_bool_epower_{i}"
         value = getRelay(i)
         post_fields[key] = str(value)
-        logging.info(f"set relay {i} to {value}")
+        logging.info(f"set relay {i+1} to {value}")
 
     # add temperatures to request
     for i, sensor_id in enumerate(config["temperature_sensors"]):
@@ -146,7 +150,7 @@ def request() -> None:
                 temperature = -42
         value = temperature
         post_fields[key] = str(value)
-        logging.info(f"set tempsensor {i} with id {sensor_id} to {temperature}")
+        logging.info(f"set tempsensor {i+1} with id {sensor_id} to {temperature}")
 
     response = requests.get(url, params=post_fields)
 
@@ -159,6 +163,7 @@ def request() -> None:
             json_response = json.loads(response.text)
 
             next_request_ms = json_response["next_request_ms"]
+            logging.info(f"Response from Bierbot Server: {json_response}")
 
             # set relays based on response
             for i in range(0, len(config["relays"])):
@@ -166,11 +171,11 @@ def request() -> None:
                 if relay_key in json_response:
                     # relay_key is e.g. "epower_0_state"
                     new_relay_state = int(json_response[relay_key])
-                    logging.info(f"received new target state {new_relay_state} for {relay_key}")
+                    logging.info(f"received new target state {new_relay_state} for relay {i+1}")
                     setRelay(i, new_relay_state)
                 else:
                     logging.warning(
-                        f"relay key {relay_key} for relay idx={i} was expected but not in response. "
+                        f"relay key {relay_key} for relay {i+1} was expected but not in response. "
                         "This is normal before activation."
                     )
                     setRelay(i, 0)
