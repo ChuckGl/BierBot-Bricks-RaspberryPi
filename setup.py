@@ -41,8 +41,6 @@ def main(apikey: str, platform: str, relays: int) -> None:
     # Get the original UID and GID if running with sudo
     uid = int(os.getenv("SUDO_UID", os.getuid()))
     gid = int(os.getenv("SUDO_GID", os.getgid()))
-    print(f"UID: {uid}")
-    print(f"GID: {gid}")
 
     config["meta"]["platform"] = platform  # type: ignore [attr-defined,index]
 
