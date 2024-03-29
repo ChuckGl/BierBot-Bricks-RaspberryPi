@@ -1,3 +1,4 @@
+influxdb_client>=1.41.0
 python-kasa>=0.6.2.1
 requests>=2.26.0
 rpi-lgpio>=0.4
